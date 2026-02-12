@@ -1,0 +1,117 @@
+<!--
+Citography Host Map
+Weronika Gajda (KU Leuven)
+
+What this page does:
+- Visualizes reference domains saved in the Citography bookmarks
+- Each point is placed using hosting-network geolocation (IP → ASN/holder → geo)
+- HOST vs EDGE/CDN is inferred by keyword match (Cloudflare/Fastly/etc.)
+
+Enjoy!
+-->
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Citography — Globe + Popup</title>
+
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Citography — Globe + Popup</title>
+
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <div class="titlebar">Citography research</div>
+
+  <!-- Sites list -->
+  <div id="sitelist">
+    <div class="header">
+      <div>Sites</div>
+      <div class="count" id="siteCount">…</div>
+    </div>
+    <div id="siteScroll"></div>
+  </div>
+
+  <!-- INFO (same hover-expand style as legend) -->
+  <div id="infoWrap">
+    <div class="collapsed">
+      <b>Info</b>
+    </div>
+
+    <div class="explain" id="infoPopup" aria-hidden="true">
+      A globe of your Citography web references.
+      Each dot is a domain, positioned by the approximate location of its hosting network.
+
+      <br><br>
+      <b>Pipeline:</b>
+      <br>• Bookmarks.html → URLs + folder paths
+      <br>• Domain → IP (DNS lookup)
+      <br>• IP → owner (RIPEstat) + location (ip-api.com)
+      <br>• Rendered with D3.js + world-atlas/topojson
+      <br>• HOST vs EDGE/CDN inferred by keyword match
+    </div>
+  </div>
+
+  <!-- Legend bottom-left -->
+  <div id="legend">
+    <div class="collapsed">
+      <b>Host map</b><br>
+      <span style="color:#111111">●</span> HOST<br>
+      <span style="color:#777777">●</span> EDGE<br>
+      <span style="color:#BBBBBB">●</span> UNKNOWN
+    </div>
+
+    <div class="explain">
+      <b>HOST</b>: likely hosting / organization network (not matching CDN keywords).<br>
+      <b>EDGE</b>: likely CDN/proxy front door (keyword match).<br>
+      <b>UNKNOWN</b>: missing/unclear owner info.<br><br>
+      <b>EDGE keywords:</b><br>
+      <span style="font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;">
+        CLOUDFLARE, AKAMAI, FASTLY, EDGECAST, CLOUDFRONT, INCAPSULA, IMPERVA, CDN, STACKPATH
+      </span>
+    </div>
+  </div>
+
+  <div id="vis"></div>
+  <div class="tooltip" id="tip"></div>
+
+  <!-- Controls bottom-right -->
+  <div class="controls ui-font">
+    <select id="proj" class="ui-font">
+      <option value="ortho_gent" selected>Orthographic (Gent)</option>
+      <option value="equalEarth">Equal Earth</option>
+      <option value="airocean">Dymaxion (Airocean)</option>
+    </select>
+    <button id="autorotate" class="ui-font">Auto-rotate</button>
+  </div>
+
+  <!-- Site popup -->
+  <div id="mapPopup">
+    <div id="mapPopupArrow"></div>
+    <div id="mapPopupHeader">
+      <div class="left">
+        <div class="topline">
+          <span class="domain" id="popDomain">domain</span>
+          <span class="tag" id="popTag">EDGE</span>
+          <a id="popLink" href="#" target="_blank" rel="noopener noreferrer">Open</a>
+        </div>
+        <div id="popFoldersWrap"></div>
+      </div>
+      <button id="mapPopupClose" type="button">✕</button>
+    </div>
+    <div id="mapPopupBody">
+      <iframe id="mapPopupFrame" src="about:blank" loading="lazy"></iframe>
+    </div>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
